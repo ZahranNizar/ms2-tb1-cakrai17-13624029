@@ -127,7 +127,7 @@ class Nodems2(Node):
         else:
             output_twist.linear.x = float(0)
             output_twist.angular.z = float(0)
-            output_type = "unkown"
+            output_type = "unknown"
 
         linear = output_twist.linear.x
         angular = output_twist.angular.z
