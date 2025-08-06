@@ -33,15 +33,15 @@ class Nodems2(Node):
         autonomous_status = self.get_parameter('autonomous_status').get_parameter_value().bool_value    
         joy_status = self.get_parameter('joy_status').get_parameter_value().bool_value
         keyboard_status = self.get_parameter('keyboard_status').get_parameter_value().bool_value
-        interval = self.get_parameter('input_frequency').get_parameter_value().double_value
+        self.interval = self.get_parameter('input_frequency').get_parameter_value().double_value
 
         self.last_received_message_autonomous_twist = Twist()
         self.last_received_message_joy_twist = Twist()
         self.last_received_message_keyboard_twist = Twist()
 
-        self.last_received_message_autonomous_type = 'unknown'
-        self.last_received_message_joy_type = 'unknown'
-        self.last_received_message_keyboard_type = 'unknown'
+        self.waktu_autonomous = self.get_clock().now().nanoseconds / 1e9
+        self.waktu_joy = self.get_clock().now().nanoseconds / 1e9
+        self.waktu_keyboard = self.get_clock().now().nanoseconds / 1e9
 
         # Publishers
         self.type_publisher = self.create_publisher(
@@ -88,58 +88,58 @@ class Nodems2(Node):
     
         # Timer
         self.timer = self.create_timer(
-            1.0 / interval,
+            1.0 / self.interval,
             self.timer_callback
         )
         
     # Subscriber Callback
     def subscriber_autonomous_callback(self, msg):
         self.last_received_message_autonomous_twist = msg
-        self.last_received_message_autonomous_type = 'autonomous'
+        self.waktu_autonomous = self.get_clock().now().nanoseconds / 1e9
         
     def subscriber_joy_callback(self, msg):
         self.last_received_message_joy_twist = msg
-        self.last_received_message_joy_type = 'joy'
+        self.waktu_joy = self.get_clock().now().nanoseconds / 1e9
 
     def subscriber_keyboard_callback(self, msg):
         self.last_received_message_keyboard_twist = msg
-        self.last_received_message_keyboard_type = 'keyboard'
+        self.waktu_keyboard = self.get_clock().now().nanoseconds / 1e9
 
     # Timer Callback
     def timer_callback(self):
+        waktu_sekarang = self.get_clock().now().nanoseconds / 1e9
 
         output_twist = Twist()
-        output_type = String()
+        output_type = 'Null'
 
         # Hasil Output
-        if self.last_received_message_keyboard_type == 'keyboard':
+        if (waktu_sekarang - self.waktu_keyboard) < (1.0 / self.interval):
             output_twist = self.last_received_message_keyboard_twist
-            output_type = self.last_received_message_keyboard_type
+            output_type = 'keyboard'
             
-        elif self.last_received_message_joy_type == 'joy':
+        elif (waktu_sekarang - self.waktu_joy) < (1.0 / self.interval):
             output_twist = self.last_received_message_joy_twist
-            output_type = self.last_received_message_joy_type
+            output_type = 'joy'
 
-        elif self.last_received_message_autonomous_type == 'autonomous':
+        elif (waktu_sekarang - self.waktu_autonomous) < (1.0 / self.interval):
             output_twist = self.last_received_message_autonomous_twist
-            output_type = self.last_received_message_autonomous_type
+            output_type = 'autonomous'
 
         else:
-            output_twist.linear.x = float(0)
-            output_twist.angular.z = float(0)
-            output_type = "unknown"
+            output_twist.linear.x = 0.0
+            output_twist.angular.z = 0.0
+            output_type = 'unknown'
 
         linear = output_twist.linear.x
         angular = output_twist.angular.z
 
+        type_msg = String()
+        type_msg.data = output_type
+
+        self.type_publisher.publish(type_msg)
         self.twist_publisher.publish(output_twist)
-        self.type_publisher.publish(String(data=output_type))
 
         self.get_logger().info(f'Mempublikasikan Type : "{output_type}" | Waktu : {time.strftime("%H:%M:%S")} | Linear : {linear:.2f} | Angular : {angular:.2f}')
-    
-        self.last_received_message_autonomous_type = 'unknown'
-        self.last_received_message_joy_type = 'unknown'
-        self.last_received_message_keyboard_type = 'unknown'
 
 
 def main(args=None):
