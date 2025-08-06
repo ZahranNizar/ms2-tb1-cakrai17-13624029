@@ -13,7 +13,6 @@
   <depend>rclpy</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
-  <depend>rcl_interfaces</depend>
   <!-- Add any other dependencies your package needs here -->
 
   <test_depend>ament_lint_auto</test_depend>
