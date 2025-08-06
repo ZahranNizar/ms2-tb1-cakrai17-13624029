@@ -8,6 +8,7 @@ node_zahran:
 
     autonomous_status : True
     joy_status : True
-    keyboard_status : False
+    keyboard_status : True
 
     input_frequency: 5.0
+
