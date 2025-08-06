@@ -22,7 +22,7 @@ class Nodems2(Node):
         self.declare_parameter('autonomous_status', True)
         self.declare_parameter('joy_status', True)
         self.declare_parameter('keyboard_status', True)
-        self.declare_parameter('input_topic_frequency', 5.0)
+        self.declare_parameter('input_frequency', 5.0)
         
 
         topic_autonomous_vel = self.get_parameter('input_autonomous_vel').get_parameter_value().string_value
@@ -34,7 +34,7 @@ class Nodems2(Node):
         autonomous_status = self.get_parameter('autonomous_status').get_parameter_value().bool_value    
         joy_status = self.get_parameter('joy_status').get_parameter_value().bool_value
         keyboard_status = self.get_parameter('keyboard_status').get_parameter_value().bool_value
-        interval = self.get_parameter('input_topic_frequency').get_parameter_value().double_value
+        interval = self.get_parameter('input_frequency').get_parameter_value().double_value
 
         self.last_received_message_autonomous_twist = Twist()
         self.last_received_message_joy_twist = Twist()
