@@ -4,7 +4,6 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
-from queue import PriorityQueue
 import time
 
 class Nodems2(Node):
