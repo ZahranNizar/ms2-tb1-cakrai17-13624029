@@ -1,0 +1,13 @@
+node_zahran:
+  ros__parameters:
+    input_autonomous_vel: 'autonomous_vel'
+    input_joy_vel: 'joy_vel'
+    input_keyboard_vel: 'keyboard_vel'
+    output_cmd_vel: 'cmd_vel'
+    output_cmd_type: 'cmd_type'
+
+    autonomous_status : True
+    joy_status : True
+    keyboard_status : False
+
+    input_frequency: 5.0
